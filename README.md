@@ -12,7 +12,7 @@ Rather than downloading the simulator and starter files you can simply complete 
 ### Step 1: Download the Simulator
 This is a new simulator environment!  
 
-Download the Motion-Planning simulator for this project that's appropriate for your operating system from the [simulator releases respository](https://github.com/udacity/FCND-Simulator-Releases/releases)
+Download the Motion-Planning simulator for this project that's appropriate for your operating system from the [simulator releases respository](https://github.com/udacity/FCND-Simulator-Releases/releases).
 
 ### Step 2: Set up your Python Environment
 If you haven't already, set up your Python environment and get all the relevant packages installed using Anaconda following instructions in [this repository](https://github.com/udacity/FCND-Term1-Starter-Kit)
@@ -30,10 +30,10 @@ python backyard_flyer_solution.py
 ```
 The quad should take off, fly a square pattern and land, just as in the previous project. If everything functions as expected then you are ready to start work on this project. 
 
-## Step 5: Inspect the relevant files
+### Step 5: Inspect the relevant files
 For this project, you are provided with two scripts, `motion_planning.py` and `planning_utils.py`. Here you'll also find a file called `colliders.csv`, which contains the 2.5D map of the simulator environment. 
 
-## Step 6: Explain what's going on in  `motion_planning.py` and `planning_utils.py`
+### Step 6: Explain what's going on in  `motion_planning.py` and `planning_utils.py`
 
 `motion_planning.py` is basically a modified version of `backyard_flyer.py` that leverages some extra functions in `planning_utils.py`. It should work right out of the box.  Try running `motion_planning.py` to see what it does. To do this, first start up the simulator, then at the command line:
  
@@ -44,7 +44,7 @@ python motion_planning.py
 
 You should see the quad fly a jerky path of waypoints to the northeast for about 10 m then land.  What's going on here? Your first task in this project is to explain what's different about `motion_planning.py` from the `backyard_flyer_solution.py` script, and how the functions provided in `planning_utils.py` work. 
 
-## Step 7: Write your planner
+### Step 7: Write your planner
 
 Your planning algorithm is going to look something like the following:
 
@@ -57,7 +57,7 @@ Your planning algorithm is going to look something like the following:
 
 Some of these steps are already implemented for you and some you need to modify or implement yourself.  See the [rubric](https://review.udacity.com/#!/rubrics/1534/view) for specifics on what you need to modify or implement.
 
-## Step 8: Write it up!
+### Step 8: Write it up!
 When you're finished, complete a detailed writeup of your solution and discuss how you addressed each step. You can use the [`writeup_template.md`](./writeup_template.md) provided here or choose a different format, just be sure to describe clearly the steps you took and code you used to address each point in the [rubric](https://review.udacity.com/#!/rubrics/1534/view). And have fun!
 
 
