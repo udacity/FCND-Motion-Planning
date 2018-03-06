@@ -1,7 +1,6 @@
 # FCND - 3D Motion Planning
-![image1]
-[//]: # (Image References)
-[image1]: ./random_images/enroute.png
+![Quad Image](./misc/enroute.png)
+
 
 
 This project is a continuation of the Backyard Flyer project where you executed a simple square shaped flight path. In this project you will integrate the techniques that you have learned throughout the last several lessons to plan a path through an urban environment. Check out the [project rubric](https://review.udacity.com/#!/rubrics/1534/view) for more detail on what constitutes a passing submission.
