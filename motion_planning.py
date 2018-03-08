@@ -158,9 +158,10 @@ class MotionPlanning(Drone):
         # TODO (if you're feeling ambitious): Try a different approach altogether!
 
         # Convert path to waypoints
-        waypoints = [(p[0] - north_offset, p[1] - east_offset, TARGET_ALTITUDE+1) for p in path]
+        waypoints = [(p[0] - north_offset, p[1] - east_offset, TARGET_ALTITUDE) for p in path]
         # Set self.waypoints
         self.waypoints = waypoints
+        print(waypoints)
         # TODO: send waypoints to sim
         self.send_waypoints()
 
