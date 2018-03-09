@@ -45,6 +45,7 @@ class MotionPlanning(Drone):
             if -1.0 * self.local_position[2] > 0.95 * self.target_position[2]:
                 self.waypoint_transition()
         elif self.flight_state == States.WAYPOINT:
+            print('target, local', type(self.target_position), type(self.local_position))
             if np.linalg.norm(self.target_position[0:2] - self.local_position[0:2]) < 1.0:
                 if len(self.waypoints) > 0:
                     self.waypoint_transition()
@@ -87,7 +88,7 @@ class MotionPlanning(Drone):
         print("waypoint transition")
         self.target_position = self.waypoints.pop(0)
         print('target position', self.target_position)
-        self.cmd_position(self.target_position[0], self.target_position[1], self.target_position[2], np.deg2rad(0.0))
+        self.cmd_position(self.target_position[0], self.target_position[1], self.target_position[2], self.target_position[3])
 
     def landing_transition(self):
         self.flight_state = States.LANDING
@@ -158,7 +159,7 @@ class MotionPlanning(Drone):
         # TODO (if you're feeling ambitious): Try a different approach altogether!
 
         # Convert path to waypoints
-        waypoints = [(p[0] - north_offset, p[1] - east_offset, TARGET_ALTITUDE) for p in path]
+        waypoints = [[p[0] - north_offset, p[1] - east_offset, TARGET_ALTITUDE, 0] for p in path]
         # Set self.waypoints
         self.waypoints = waypoints
         print(waypoints)
@@ -184,7 +185,7 @@ if __name__ == "__main__":
     parser.add_argument('--host', type=str, default='127.0.0.1', help="host address, i.e. '127.0.0.1'")
     args = parser.parse_args()
 
-    conn = MavlinkConnection('tcp:{0}:{1}'.format(args.host, args.port))
+    conn = MavlinkConnection('tcp:{0}:{1}'.format(args.host, args.port), timeout=60)
     drone = MotionPlanning(conn)
     time.sleep(1)
 
