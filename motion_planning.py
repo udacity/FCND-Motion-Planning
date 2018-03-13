@@ -45,7 +45,6 @@ class MotionPlanning(Drone):
             if -1.0 * self.local_position[2] > 0.95 * self.target_position[2]:
                 self.waypoint_transition()
         elif self.flight_state == States.WAYPOINT:
-            print('target, local', type(self.target_position), type(self.local_position))
             if np.linalg.norm(self.target_position[0:2] - self.local_position[0:2]) < 1.0:
                 if len(self.waypoints) > 0:
                     self.waypoint_transition()
@@ -132,14 +131,10 @@ class MotionPlanning(Drone):
                                                                          self.local_position))
         # Read in obstacle map
         data = np.loadtxt('colliders.csv', delimiter=',', dtype='Float64', skiprows=3)
-        # Determine offsets between grid and map
-        north_offset = int(np.abs(np.min(data[:, 0])))
-        east_offset = int(np.abs(np.min(data[:, 1])))
-
-        print("North offset = {0}, east offset = {1}".format(north_offset, east_offset))
-
+        
         # Define a grid for a particular altitude and safety margin around obstacles
-        grid = create_grid(data, TARGET_ALTITUDE, SAFETY_DISTANCE)
+        grid, north_offset, east_offset = create_grid(data, TARGET_ALTITUDE, SAFETY_DISTANCE)
+        print("North offset = {0}, east offset = {1}".format(north_offset, east_offset))
         # Define starting point on the grid (this is just grid center)
         grid_start = (north_offset, east_offset)
         # TODO: convert start position to current position rather than map center
@@ -162,7 +157,6 @@ class MotionPlanning(Drone):
         waypoints = [[p[0] - north_offset, p[1] - east_offset, TARGET_ALTITUDE, 0] for p in path]
         # Set self.waypoints
         self.waypoints = waypoints
-        print(waypoints)
         # TODO: send waypoints to sim
         self.send_waypoints()
 
