@@ -20,8 +20,8 @@ def create_grid(data, drone_altitude, safety_distance):
 
     # given the minimum and maximum coordinates we can
     # calculate the size of the grid.
-    north_size = int(np.ceil((north_max - north_min)))
-    east_size = int(np.ceil((east_max - east_min)))
+    north_size = int(np.ceil((north_max - north_min + 1)))
+    east_size = int(np.ceil((east_max - east_min + 1)))
 
     # Initialize an empty grid
     grid = np.zeros((north_size, east_size))
@@ -36,9 +36,10 @@ def create_grid(data, drone_altitude, safety_distance):
                 int(np.clip(east - d_east - safety_distance - east_min, 0, east_size-1)),
                 int(np.clip(east + d_east + safety_distance - east_min, 0, east_size-1)),
             ]
-            grid[obstacle[0]:obstacle[1], obstacle[2]:obstacle[3]] = 1
+            grid[obstacle[0]:obstacle[1]+1, obstacle[2]:obstacle[3]+1] = 1
 
     return grid, int(north_min), int(east_min)
+
 
 # Assume all actions cost the same.
 class Action(Enum):
