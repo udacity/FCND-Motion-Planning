@@ -193,19 +193,45 @@ def prune_path_using_collinearity(path):
 
 
 def save_plot(grid, path, start_ne, goal_ne, file="grid.png"):
-    pass
-    # import matplotlib.pyplot as plt
-    #
-    # plt.imshow(grid, cmap='Greys', origin='lower')
-    #
-    # # For the purposes of the visual the east coordinate lay along
-    # # the x-axis and the north coordinates long the y-axis.
-    # plt.plot(start_ne[1], start_ne[0], 'x')
-    # plt.plot(goal_ne[1], goal_ne[0], 'x')
-    #
-    # pp = np.array(path)
-    # plt.plot(pp[:, 1], pp[:, 0], 'g')
-    #
-    # plt.xlabel('EAST')
-    # plt.ylabel('NORTH')
-    # plt.savefig(file)
+    import matplotlib.pyplot as plt
+
+    plt.figure(figsize=(20, 10))
+    plt.imshow(grid, origin='lower')
+
+    plt.plot(start_ne[1], start_ne[0], 'x')
+    plt.plot(goal_ne[1], goal_ne[0], 'x')
+
+    pp = np.array(path)
+    plt.plot(pp[:, 1], pp[:, 0], 'g')
+    plt.scatter(pp[:, 1], pp[:, 0])
+
+    plt.xlabel('EAST')
+    plt.ylabel('NORTH')
+
+    plt.savefig(file)
+    plt.clf()
+
+
+def prune_path_using_bresenham(path, grid):
+    from bresenham import bresenham
+
+    path_ = [p for p in path]
+    p = path_[0]
+
+    pruned_path = [path_[0]]
+
+    for i in path_[1:]:
+        q = int(i[0]), int(i[1])
+        #     print(p, q)
+        pp = bresenham(p[0], p[1], int(q[0]), int(q[1]))
+        cells = [i for i in pp]
+        # print(p, q, cells)
+
+        path_infeasible = len([True for i in cells if grid[i[0]][i[1]] == 1]) > 0
+
+        if path_infeasible:
+            pruned_path.append(q)
+            p = q
+
+    pruned_path.append(path_[-1])
+    return pruned_path

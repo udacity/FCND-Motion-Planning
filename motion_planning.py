@@ -5,7 +5,8 @@ from enum import Enum, auto
 
 import numpy as np
 
-from planning_utils import a_star, heuristic, create_grid, prune_path_using_collinearity, save_plot
+from planning_utils import a_star, heuristic, create_grid, prune_path_using_collinearity, save_plot, \
+    prune_path_using_bresenham
 from udacidrone import Drone
 from udacidrone.connection import MavlinkConnection
 from udacidrone.messaging import MsgID
@@ -24,7 +25,7 @@ class States(Enum):
 
 class MotionPlanning(Drone):
 
-    def __init__(self, connection, desired_global_goal_position=None):
+    def __init__(self, connection, desired_global_goal_position, run_id):
         super().__init__(connection)
 
         self.target_position = np.array([0.0, 0.0, 0.0])
@@ -34,6 +35,7 @@ class MotionPlanning(Drone):
 
         # initial state
         self.flight_state = States.MANUAL
+        self.run_id = run_id
 
         self.desired_global_goal_position = desired_global_goal_position
 
@@ -156,7 +158,7 @@ class MotionPlanning(Drone):
         grid_start = (grid_start_north, grid_start_east)
 
         # Set goal as some arbitrary position on the grid
-        grid_goal = (-north_offset + 10, -east_offset + 10)
+        # grid_goal = (-north_offset + 10, -east_offset + 10)
         # TODO: adapt to set goal as latitude / longitude position and convert
         local_goal_north, local_goal_east, _ = global_to_local(self.desired_global_goal_position, self.global_home)
         grid_goal_north = int(np.ceil(local_goal_north - north_offset))
@@ -167,20 +169,41 @@ class MotionPlanning(Drone):
         # TODO: add diagonal motions with a cost of sqrt(2) to your A* implementation
         # or move to a different search space such as a graph (not done here)
         print('Local Start and Goal: ', grid_start, grid_goal)
-        path, _ = a_star(grid, heuristic, grid_start, grid_goal)
+
+        import os
+        import json
+        saved_file = os.path.join(os.path.curdir, self.run_id)
+        print('Saved file %s exists? %s' % (saved_file, os.path.exists(saved_file)))
+        if os.path.exists(saved_file):
+            print('Reading paths from saved file ', saved_file)
+            with open(saved_file) as json_file:
+                path = json.load(json_file)
+        else:
+            path, _ = a_star(grid, heuristic, grid_start, grid_goal)
+            with open(saved_file, 'w') as outfile:
+                json.dump(path, outfile)
+
+        # Plot
+
+        path_plot = "%s.png" % self.run_id
+        print('Saving the full path plot to ', path_plot)
+        save_plot(grid, path, grid_start, grid_goal, path_plot)
+
+        path_plot = "%s-collinear.png" % self.run_id
+        print('Saving the collinear path plot to ', path_plot)
+        save_plot(grid, prune_path_using_collinearity(path), grid_start, grid_goal, path_plot)
 
         # TODO: prune path to minimize number of waypoints
-        pruned_path = prune_path_using_collinearity(path)
+        pruned_path = prune_path_using_bresenham(path, grid)
+        path_plot = "%s-bresenham.png" % self.run_id
+        print('Saving the bresenham path plot to ', path_plot)
+        save_plot(grid, pruned_path, grid_start, grid_goal, path_plot)
 
         # TODO (if you're feeling ambitious): Try a different approach altogether!
 
         # Convert path to waypoints
         waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in pruned_path]
 
-        # Plot
-        file = "grid.png"
-        print('Saving the plot to ', file)
-        save_plot(grid, pruned_path, grid_start, grid_goal, file)
         # Set self.waypoints
         self.waypoints = waypoints
         # TODO: send waypoints to sim (this is just for visualization of waypoints)
@@ -207,11 +230,12 @@ if __name__ == "__main__":
     parser.add_argument('--desired_goal_lat', type=float, default=37.796342, help="Desired Goal latitude")
     parser.add_argument('--desired_goal_lon', type=float, default=-122.398248, help="Desired Goal longitude")
     parser.add_argument('--desired_goal_alt', type=float, default=5, help="Desired Goal altitude")
+    parser.add_argument('--run_id', type=str, help="Run id")
     args = parser.parse_args()
 
     conn = MavlinkConnection('tcp:{0}:{1}'.format(args.host, args.port), timeout=60)
     desired_global_goal_position = np.array([args.desired_goal_lon, args.desired_goal_lat, args.desired_goal_alt], dtype='Float64')
-    drone = MotionPlanning(conn, desired_global_goal_position)
+    drone = MotionPlanning(conn, desired_global_goal_position, args.run_id)
     time.sleep(1)
 
     drone.start()
